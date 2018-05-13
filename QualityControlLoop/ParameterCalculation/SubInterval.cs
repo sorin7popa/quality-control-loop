@@ -1,4 +1,4 @@
-﻿namespace QualityControlLoop
+﻿namespace QualityControlLoop.ParameterCalculation
 {
     internal class SubInterval
     {

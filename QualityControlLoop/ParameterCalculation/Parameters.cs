@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QualityControlLoop
+namespace QualityControlLoop.ParameterCalculation
 {
     internal class Parameters
     {

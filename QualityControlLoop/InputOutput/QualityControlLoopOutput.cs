@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using QualityControlLoop.ParameterCalculation;
 
-namespace QualityControlLoop
+namespace QualityControlLoop.InputOutput
 {
     internal class QualityControlLoopOutput
     {

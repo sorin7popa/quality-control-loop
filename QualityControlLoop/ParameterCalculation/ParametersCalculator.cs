@@ -13,7 +13,7 @@ namespace QualityControlLoop
             var mean = data.Average();
             var dispersion = Dispersion(data);
             var intervalCount = IntervalCount(data.Count);
-            var intervals = SubIntervals(minInput, maxInput, intervalCount, data, mean, dispersion);
+            var intervals = SubIntervals(minInput, maxInput, intervalCount, data, dispersion);
             var hi2 = Hi2(intervals, data.Count);
 
             var parameters = new Parameters
@@ -46,9 +46,10 @@ namespace QualityControlLoop
         }
 
         private static List<SubInterval> SubIntervals(double minInput, double maxInput, 
-            int intervalCount, IReadOnlyCollection<double> data, double mean, double dispersion)
+            int intervalCount, IReadOnlyCollection<double> data, double dispersion)
         {
             var dataIntervalSize = maxInput - minInput;
+            var dataIntervalCenter = (maxInput + minInput) / 2;
             var subIntervalSize = dataIntervalSize / intervalCount;
             var subIntervals = Enumerable.Range(0, intervalCount).Select(i => new SubInterval
             {
@@ -64,24 +65,34 @@ namespace QualityControlLoop
             {
                 subInterval.InputsCount = data.Count(x => subInterval.LeftBound <= x && x < subInterval.RightBound);
                 subInterval.InputsFrequency = (double)subInterval.InputsCount / data.Count;
-                subInterval.GaussExpectedFrequency = ExpectedGaussFrequency(subInterval.LeftBound, subInterval.RightBound, mean, dispersion);
+                subInterval.GaussExpectedFrequency = ExpectedGaussFrequency(subInterval.LeftBound, subInterval.RightBound, dataIntervalCenter, dispersion);
                 subInterval.GaussExpectedCount = subInterval.GaussExpectedFrequency * data.Count;
             }
 
             return subIntervals;
         }
 
-        private static double ExpectedGaussFrequency(double leftBound, double rightBound, double mean, double dispersion)
+        private static double ExpectedGaussFrequency(double leftBound, double rightBound, double center, double dispersion)
         {
-            var lambdaLeftBound = Math.Abs(leftBound - mean) / dispersion;
-            var lambdaRightBound = Math.Abs(rightBound - mean) / dispersion;
+            var lambdaLeftBound = Math.Abs(leftBound - center) / dispersion;
+            var lambdaRightBound = Math.Abs(rightBound - center) / dispersion;
 
             var frequencyForLeftBound = GaussExpectedFrequencies.GetFrequency(lambdaLeftBound);
             var frequencyForRightBound = GaussExpectedFrequencies.GetFrequency(lambdaRightBound);
 
-            var expectedFrequency = leftBound < mean && rightBound > mean
-                ? frequencyForLeftBound + frequencyForRightBound
-                : frequencyForLeftBound - frequencyForRightBound;
+            double expectedFrequency;
+            if (leftBound < center && rightBound < center)
+            {
+                expectedFrequency = frequencyForLeftBound - frequencyForRightBound;
+            }
+            else if (leftBound < center && rightBound > center)
+            {
+                expectedFrequency = frequencyForLeftBound + frequencyForRightBound;
+            }
+            else
+            {
+                expectedFrequency = frequencyForRightBound - frequencyForLeftBound;
+            }
 
             return expectedFrequency;
         }

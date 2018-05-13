@@ -43,16 +43,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Calibrator.cs" />
-    <Compile Include="GaussExpectedFrequencies.cs" />
+    <Compile Include="ParameterCalculation\GaussExpectedFrequencies.cs" />
     <Compile Include="DataWindow.cs" />
     <Compile Include="Optimizer.cs" />
-    <Compile Include="Parameters.cs" />
-    <Compile Include="ParametersCalculator.cs" />
+    <Compile Include="ParameterCalculation\Parameters.cs" />
+    <Compile Include="ParameterCalculation\ParametersCalculator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository.cs" />
-    <Compile Include="Stabilizer.cs" />
-    <Compile Include="SubInterval.cs" />
+    <Compile Include="InputOutput\QualityControlLoopOutput.cs" />
+    <Compile Include="InputOutput\Repository.cs" />
+    <Compile Include="Stabilizing\Stabilizer.cs" />
+    <Compile Include="Stabilizing\StabilizerPrecision.cs" />
+    <Compile Include="ParameterCalculation\SubInterval.cs" />
+    <Compile Include="Stabilizing\StandardHi2Values.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

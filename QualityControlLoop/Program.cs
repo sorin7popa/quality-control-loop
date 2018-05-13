@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using QualityControlLoop.Stabilizing;
 
 namespace QualityControlLoop
 {
@@ -10,6 +10,9 @@ namespace QualityControlLoop
         private const double Xi = 8.91;
         private const double Xs = 8.94;
 
+        private const StabilizerPrecision Precision = StabilizerPrecision._950;
+        private const int NumberOfParameters = 2; //mean & dispersion
+
         private static readonly Repository Repository;
         private static readonly DataWindow DataWindow;
         private static readonly ParametersCalculator ParametersCalculator;
@@ -20,10 +23,11 @@ namespace QualityControlLoop
         static Program()
         {
             Repository = new Repository(InputFileName, OutputFileName);
-            DataWindow = new DataWindow(DataWindowSize, Xi, Xs);
+            DataWindow = new DataWindow(DataWindowSize);
             ParametersCalculator = new ParametersCalculator();
             Optimizer = new Optimizer(Xi, Xs);
-            Stabilizer = new Stabilizer();
+            var standardHi2Values = new StandardHi2Values(Precision);
+            Stabilizer = new Stabilizer(standardHi2Values, NumberOfParameters);
             Calibrator = new Calibrator(Xi, Xs);
         }
 
@@ -34,46 +38,21 @@ namespace QualityControlLoop
                 var measuredInput = Repository.ReadNext();
                 DataWindow.Enqueue(measuredInput);
 
+                if (!DataWindow.Full())
+                {
+                    continue;
+                }
+
                 var parameters = ParametersCalculator.GetParameters(DataWindow.Data);
                 var nonCompliancePercentage = Optimizer.NonCompliancePercentage(DataWindow.Data);
 
-                var systemErrors = Stabilizer.SystemErrors(parameters.Hi2);
+                var systemErrors = Stabilizer.SystemErrors(parameters.Hi2, parameters.IntervalCount);
                 var calibration = systemErrors ? default(double) : Calibrator.GetCalibration(parameters.Mean);
-                
-                var output = new QualityControlLoopOutput
-                {
-                    CurrentMeasureadInput = measuredInput,
-                    DataWindow = string.Join(",", DataWindow.Data),
-                    MinInput = parameters.MinInput,
-                    MaxInput = parameters.MaxInput,
-                    MeanValue = parameters.Mean,
-                    Dispersion = parameters.Dispersion,
-                    IntervalCount = parameters.IntervalCount,
-                    Intervals = parameters.Intervals,
-                    Hi2 = parameters.Hi2,
-                    NonCompliancePercentage = nonCompliancePercentage,
-                    CalibrationAction = calibration,
-                    SystemErrorsExist = systemErrors
-                };
 
+                var output = new QualityControlLoopOutput(measuredInput, DataWindow.Data, parameters,
+                    nonCompliancePercentage, calibration, systemErrors);
                 Repository.Write(output);
             }
         }
-    }
-
-    internal class QualityControlLoopOutput
-    {
-        public double CurrentMeasureadInput { get; set; }
-        public string DataWindow { get; set; }
-        public double MinInput { get; set; }
-        public double MaxInput { get; set; }
-        public double MeanValue { get; set; }
-        public double Dispersion { get; set; }
-        public int IntervalCount { get; set; }
-        public IEnumerable<SubInterval> Intervals { get; set; }
-        public double Hi2 { get; set; }
-        public object NonCompliancePercentage { get; set; }
-        public double CalibrationAction { get; set; }
-        public bool SystemErrorsExist { get; set; }
     }
 }

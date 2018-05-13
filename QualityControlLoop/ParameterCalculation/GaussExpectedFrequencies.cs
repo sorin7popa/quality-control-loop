@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace QualityControlLoop
 {
@@ -42,12 +43,17 @@ namespace QualityControlLoop
                 { 3.1, 0.4990 },
                 { 3.2, 0.4993 },
                 { 3.3, 0.4995 },
-                { 3.4, 0.4997 }
+                { 3.4, 0.4997 },
             };
 
         public static double GetFrequency(double lambda)
         {
             var roundedLambda = Math.Round(lambda * 10) / 10;
+            if (roundedLambda > Frequencies.Keys.Last())
+            {
+                roundedLambda = Frequencies.Keys.Last();
+            }
+
             return Frequencies[roundedLambda];
         }
     }

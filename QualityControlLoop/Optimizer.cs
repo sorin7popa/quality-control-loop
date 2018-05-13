@@ -14,10 +14,10 @@ namespace QualityControlLoop
             _xs = xs;
         }
 
-        public object NonCompliancePercentage(IReadOnlyCollection<double> measuredData)
+        public double NonCompliancePercentage(IReadOnlyCollection<double> measuredData)
         {
             var count = measuredData.Count(d => d < _xi || d > _xs);
-            var percentage = count / measuredData.Count * 100;
+            var percentage = (double)count / measuredData.Count;
 
             return percentage;
         }

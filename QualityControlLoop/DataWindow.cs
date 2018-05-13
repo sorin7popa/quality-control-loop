@@ -5,19 +5,29 @@ namespace QualityControlLoop
 {
     internal class DataWindow
     {
+        private readonly int _dataWindowSize;
         private readonly List<double> _data;
 
         public IReadOnlyCollection<double> Data => _data.ToList();
 
-        public DataWindow(int dataWindowSize, double xi, double xs)
+        public DataWindow(int dataWindowSize)
         {
-            _data = Enumerable.Repeat((xi + xs) / 2, dataWindowSize).ToList();
+            _dataWindowSize = dataWindowSize;
+            _data = new List<double>(dataWindowSize);
         }
 
         public void Enqueue(double value)
         {
-            _data.RemoveAt(0);
+            if (Full())
+            {
+                _data.RemoveAt(0);
+            }
             _data.Add(value);
+        }
+
+        public bool Full()
+        {
+            return _data.Count == _dataWindowSize;
         }
     }
 }

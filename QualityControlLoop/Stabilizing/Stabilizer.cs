@@ -11,11 +11,11 @@
             _numberOfParameters = numberOfParameters;
         }
 
-        public bool SystemErrors(double hi2, int intervalCount)
+        public bool SystemErrors(double hi2, int intervalCount, out double referenceHi2)
         {
             var v = intervalCount + _numberOfParameters + 1;
-            var referenceHi2Value = _standardHi2Values.GetValue(v);
-            return hi2 > referenceHi2Value;
+            referenceHi2 = _standardHi2Values.GetValue(v);
+            return hi2 > referenceHi2;
         }
     }
 }

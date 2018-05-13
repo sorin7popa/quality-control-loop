@@ -40,6 +40,8 @@ namespace QualityControlLoop.InputOutput
                 nameof(QualityControlLoopOutput.MeanValue),
                 nameof(QualityControlLoopOutput.Dispersion),
                 nameof(QualityControlLoopOutput.IntervalCount),
+                nameof(QualityControlLoopOutput.Hi2),
+                nameof(QualityControlLoopOutput.ReferenceHi2),
                 nameof(QualityControlLoopOutput.NonCompliancePercentage),
                 nameof(QualityControlLoopOutput.CalibrationAction),
                 nameof(QualityControlLoopOutput.SystemErrorsExist),
@@ -64,6 +66,8 @@ namespace QualityControlLoop.InputOutput
                 output.MeanValue.ToString(CultureInfo.InvariantCulture),
                 output.Dispersion.ToString(CultureInfo.InvariantCulture),
                 output.IntervalCount.ToString(CultureInfo.InvariantCulture),
+                output.Hi2.ToString(CultureInfo.InvariantCulture),
+                output.ReferenceHi2.ToString(CultureInfo.InvariantCulture),
                 output.NonCompliancePercentage.ToString(CultureInfo.InvariantCulture),
                 output.CalibrationAction.ToString(CultureInfo.InvariantCulture),
                 output.SystemErrorsExist.ToString(CultureInfo.InvariantCulture),
@@ -72,7 +76,7 @@ namespace QualityControlLoop.InputOutput
             File.AppendAllLines($"{_parametersFileName}.{_fileExtension}", new List<string> { dataLine });
         }
 
-        private void WriteDataWindow(IReadOnlyCollection<double> outputDataWindow)
+        private void WriteDataWindow(IEnumerable<double> outputDataWindow)
         {
             var dataOutputFileName = $"{_parametersFileName}_{_writingIterationCount}_{_dataWindowFileSuffix}.{_fileExtension}";
             File.WriteAllLines(dataOutputFileName, outputDataWindow.Select(d => d.ToString(CultureInfo.InvariantCulture)));

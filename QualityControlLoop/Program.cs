@@ -55,11 +55,11 @@ namespace QualityControlLoop
                 var parameters = ParametersCalculator.GetParameters(DataWindow.Data);
                 var nonCompliancePercentage = Optimizer.NonCompliancePercentage(DataWindow.Data);
 
-                var systemErrors = Stabilizer.SystemErrors(parameters.Hi2, parameters.IntervalCount);
+                var systemErrors = Stabilizer.SystemErrors(parameters.Hi2, parameters.IntervalCount, out var referenceHi2);
                 var calibration = systemErrors ? default(double) : Calibrator.GetCalibration(parameters.Mean);
 
-                var output = new QualityControlLoopOutput(measuredInput, DataWindow.Data, parameters,
-                    nonCompliancePercentage, calibration, systemErrors);
+                var output = new QualityControlLoopOutput(measuredInput, DataWindow.Data, parameters, 
+                    referenceHi2, nonCompliancePercentage, calibration, systemErrors);
                 DataWriter.Write(output);
             }
         }

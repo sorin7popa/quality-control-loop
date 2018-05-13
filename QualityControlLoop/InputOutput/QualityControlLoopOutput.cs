@@ -5,7 +5,9 @@ namespace QualityControlLoop.InputOutput
 {
     internal class QualityControlLoopOutput
     {
-        public QualityControlLoopOutput(double currentMeasureadInput, IReadOnlyCollection<double> dataWindow, Parameters parameters, double nonCompliancePercentage, double calibrationAction, bool systemErrorsExist)
+        public QualityControlLoopOutput(double currentMeasureadInput, IReadOnlyCollection<double> dataWindow,
+            Parameters parameters, double referenceHi2, double nonCompliancePercentage, double calibrationAction,
+            bool systemErrorsExist)
         {
             CurrentMeasureadInput = currentMeasureadInput;
             DataWindow = dataWindow;
@@ -16,6 +18,7 @@ namespace QualityControlLoop.InputOutput
             IntervalCount = parameters.IntervalCount;
             Intervals = parameters.Intervals;
             Hi2 = parameters.Hi2;
+            ReferenceHi2 = referenceHi2;
             NonCompliancePercentage = nonCompliancePercentage;
             CalibrationAction = calibrationAction;
             SystemErrorsExist = systemErrorsExist;
@@ -30,6 +33,7 @@ namespace QualityControlLoop.InputOutput
         public int IntervalCount { get; set; }
         public IEnumerable<SubInterval> Intervals { get; set; }
         public double Hi2 { get; set; }
+        public double ReferenceHi2 { get; set; }
         public double NonCompliancePercentage { get; set; }
         public double CalibrationAction { get; set; }
         public bool SystemErrorsExist { get; set; }

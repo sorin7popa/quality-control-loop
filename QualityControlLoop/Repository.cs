@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 
 namespace QualityControlLoop
@@ -10,7 +11,10 @@ namespace QualityControlLoop
         public Repository(string inputFileName, string outputFileName)
         {
             _inputFile = new StreamReader(inputFileName);
-            _outputFileName = outputFileName;
+
+            var outputFileNameWithoutExtension = outputFileName.Substring(0, outputFileName.Length - 4);
+            var extension = outputFileName.Substring(outputFileName.Length - 3, 3);
+            _outputFileName = $"{outputFileNameWithoutExtension}_{DateTime.Now.Ticks}.{extension}";
         }
 
         public bool DataAvailable()
@@ -33,12 +37,7 @@ namespace QualityControlLoop
 
         public void Write(QualityControlLoopOutput output)
         {
-            if (!File.Exists(_outputFileName))
-            {
-                File.Create(_outputFileName);
-            }
-
-            File.AppendAllText(_outputFileName, output.CalibrationAction.ToString(CultureInfo.InvariantCulture));
+            File.AppendAllText(_outputFileName, output.CalibrationAction.ToString(CultureInfo.InvariantCulture) + Environment.NewLine);
         }
     }
 }

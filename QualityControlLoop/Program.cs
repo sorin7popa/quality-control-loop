@@ -58,10 +58,6 @@ namespace QualityControlLoop
 
                 Repository.Write(output);
             }
-            
-
-            // Suspend the screen.  
-            System.Console.ReadLine();
         }
     }
 

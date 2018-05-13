@@ -3,3 +3,6 @@
 *.ide*
 /QualityControlLoop/bin/*
 /QualityControlLoop/obj/*
+/docs/*.docx
+/QualityControlLoop/io/Output*.csv
+/QualityControlLoop/QualityControlLoop.csproj.user

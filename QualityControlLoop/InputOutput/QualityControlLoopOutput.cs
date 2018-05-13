@@ -8,7 +8,7 @@ namespace QualityControlLoop.InputOutput
         public QualityControlLoopOutput(double currentMeasureadInput, IReadOnlyCollection<double> dataWindow, Parameters parameters, double nonCompliancePercentage, double calibrationAction, bool systemErrorsExist)
         {
             CurrentMeasureadInput = currentMeasureadInput;
-            DataWindow = string.Join(",", dataWindow);
+            DataWindow = dataWindow;
             MinInput = parameters.MinInput;
             MaxInput = parameters.MaxInput;
             MeanValue = parameters.Mean;
@@ -22,7 +22,7 @@ namespace QualityControlLoop.InputOutput
         }
 
         public double CurrentMeasureadInput { get; set; }
-        public string DataWindow { get; set; }
+        public IReadOnlyCollection<double> DataWindow { get; set; }
         public double MinInput { get; set; }
         public double MaxInput { get; set; }
         public double MeanValue { get; set; }
@@ -30,7 +30,7 @@ namespace QualityControlLoop.InputOutput
         public int IntervalCount { get; set; }
         public IEnumerable<SubInterval> Intervals { get; set; }
         public double Hi2 { get; set; }
-        public object NonCompliancePercentage { get; set; }
+        public double NonCompliancePercentage { get; set; }
         public double CalibrationAction { get; set; }
         public bool SystemErrorsExist { get; set; }
     }

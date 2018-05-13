@@ -4,8 +4,8 @@ namespace QualityControlLoop
 {
     internal class Program
     {
-        private const string InputFileName = "../../io/MeasuredInput.csv";
-        private const string OutputFileName = "../../io/Output.csv";
+        private const string InputFileName = "MeasuredInput.csv";
+        private const string OutputFileName = "Output.csv";
         private const int DataWindowSize = 50;
         private const double Xi = 8.91;
         private const double Xs = 8.94;

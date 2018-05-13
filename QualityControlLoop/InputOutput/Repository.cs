@@ -8,6 +8,7 @@ namespace QualityControlLoop
     {
         private readonly StreamReader _inputFile;
         private readonly string _outputFileName;
+
         public Repository(string inputFileName, string outputFileName)
         {
             _inputFile = new StreamReader(inputFileName);

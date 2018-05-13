@@ -7,7 +7,11 @@ namespace QualityControlLoop
     internal class Program
     {
         private const string InputFileName = "MeasuredInput.csv";
-        private const string OutputFileName = "Output.csv";
+        private const string OutputFolderPrefix = "Output";
+        private const string ParametersOutputFileName = "Parameters";
+        private const string DataWindowFileSuffix = "Data";
+        private const string DataIntervalsFileSuffix = "Intervals";
+        private const string OutputFileExtension = "csv";
         private const int DataWindowSize = 50;
         private const double Xi = 8.91;
         private const double Xs = 8.94;
@@ -15,7 +19,8 @@ namespace QualityControlLoop
         private const StabilizerPrecision Precision = StabilizerPrecision._950;
         private const int NumberOfParameters = 2; //mean & dispersion
 
-        private static readonly Repository Repository;
+        private static readonly DataReader DataReader;
+        private static readonly DataWriter DataWriter;
         private static readonly DataWindow DataWindow;
         private static readonly ParametersCalculator ParametersCalculator;
         private static readonly Optimizer Optimizer;
@@ -24,7 +29,9 @@ namespace QualityControlLoop
 
         static Program()
         {
-            Repository = new Repository(InputFileName, OutputFileName);
+            DataReader = new DataReader(InputFileName);
+            DataWriter = new DataWriter(OutputFolderPrefix, ParametersOutputFileName, DataWindowFileSuffix,
+                DataIntervalsFileSuffix, OutputFileExtension);
             DataWindow = new DataWindow(DataWindowSize);
             ParametersCalculator = new ParametersCalculator();
             Optimizer = new Optimizer(Xi, Xs);
@@ -35,9 +42,9 @@ namespace QualityControlLoop
 
         private static void Main(string[] args)
         {
-            while (Repository.DataAvailable())
+            while (DataReader.DataAvailable())
             {
-                var measuredInput = Repository.ReadNext();
+                var measuredInput = DataReader.ReadNext();
                 DataWindow.Enqueue(measuredInput);
 
                 if (!DataWindow.Full())
@@ -53,7 +60,7 @@ namespace QualityControlLoop
 
                 var output = new QualityControlLoopOutput(measuredInput, DataWindow.Data, parameters,
                     nonCompliancePercentage, calibration, systemErrors);
-                Repository.Write(output);
+                DataWriter.Write(output);
             }
         }
     }

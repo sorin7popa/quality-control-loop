@@ -7,46 +7,33 @@ using QualityControlLoop.ParameterCalculation;
 
 namespace QualityControlLoop.InputOutput
 {
-    internal class Repository
+    internal class DataWriter
     {
+        private readonly string _parametersFileName;
+        private readonly string _dataWindowFileSuffix;
+        private readonly string _dataIntervalsFileSuffix;
+        private readonly string _fileExtension;
+
         private static int _writingIterationCount;
-        private readonly StreamReader _inputFile;
-        private readonly string _outputFileNameWithoutExtension;
-        private readonly string _outputFileNameExtension;
-        private readonly string _outputFileName;
 
-        public Repository(string inputFileName, string outputFileName)
+        public DataWriter(string folderPrefix, string parametersFileName, string dataWindowFileSuffix,
+            string dataIntervalsFileSuffix, string fileExtension)
         {
-            _inputFile = new StreamReader(inputFileName);
+            var folderName = $"{folderPrefix}_{DateTime.Now.Ticks}";
+            _parametersFileName = Path.Combine(folderName, parametersFileName);
+            _dataWindowFileSuffix = dataWindowFileSuffix;
+            _dataIntervalsFileSuffix = dataIntervalsFileSuffix;
+            _fileExtension = fileExtension;
 
-            _outputFileNameWithoutExtension = $"{outputFileName.Substring(0, outputFileName.Length - 4)}_{DateTime.Now.Ticks}";
-            _outputFileNameExtension = outputFileName.Substring(outputFileName.Length - 3, 3);
-            _outputFileName = $"{_outputFileNameWithoutExtension}.{_outputFileNameExtension}";
-            PrintFileHeader();
+            Directory.CreateDirectory(folderName);
+            WriteOutputFileHeader();
         }
 
-        public bool DataAvailable()
-        {
-            return _inputFile.Peek() > 0;
-        }
-
-        public double ReadNext()
-        {
-            string line;
-            double measuredInput = 0;
-
-            if ((line = _inputFile.ReadLine()) != null)
-            {
-                measuredInput = double.Parse(line);
-            }
-
-            return measuredInput;
-        }
-
-        private void PrintFileHeader()
+        private void WriteOutputFileHeader()
         {
             var headerLine = string.Join(",", new List<string>
             {
+                "Index",
                 nameof(QualityControlLoopOutput.CurrentMeasureadInput),
                 nameof(QualityControlLoopOutput.MinInput),
                 nameof(QualityControlLoopOutput.MaxInput),
@@ -58,7 +45,7 @@ namespace QualityControlLoop.InputOutput
                 nameof(QualityControlLoopOutput.SystemErrorsExist),
             });
 
-            File.AppendAllLines(_outputFileName, new List<string> {headerLine});
+            File.AppendAllLines($"{_parametersFileName}.{_fileExtension}", new List<string> {headerLine});
         }
 
         public void Write(QualityControlLoopOutput output)
@@ -70,6 +57,7 @@ namespace QualityControlLoop.InputOutput
 
             var dataLine = string.Join(",", new List<string>
             {
+                _writingIterationCount.ToString(CultureInfo.InvariantCulture),
                 output.CurrentMeasureadInput.ToString(CultureInfo.InvariantCulture),
                 output.MinInput.ToString(CultureInfo.InvariantCulture),
                 output.MaxInput.ToString(CultureInfo.InvariantCulture),
@@ -81,18 +69,18 @@ namespace QualityControlLoop.InputOutput
                 output.SystemErrorsExist.ToString(CultureInfo.InvariantCulture),
             });
 
-            File.AppendAllLines(_outputFileName, new List<string> { dataLine });
+            File.AppendAllLines($"{_parametersFileName}.{_fileExtension}", new List<string> { dataLine });
         }
 
         private void WriteDataWindow(IReadOnlyCollection<double> outputDataWindow)
         {
-            var dataOutputFileName = $"{_outputFileNameWithoutExtension}_{_writingIterationCount}_data.{_outputFileNameExtension}";
+            var dataOutputFileName = $"{_parametersFileName}_{_writingIterationCount}_{_dataWindowFileSuffix}.{_fileExtension}";
             File.WriteAllLines(dataOutputFileName, outputDataWindow.Select(d => d.ToString(CultureInfo.InvariantCulture)));
         }
-        
+
         private void WriteIntervals(IEnumerable<SubInterval> outputIntervals)
         {
-            var dataOutputFileName = $"{_outputFileNameWithoutExtension}_{_writingIterationCount}_intervals.{_outputFileNameExtension}";
+            var dataOutputFileName = $"{_parametersFileName}_{_writingIterationCount}_{_dataIntervalsFileSuffix}.{_fileExtension}";
 
             var headerLine = string.Join(",", new List<string>
             {
